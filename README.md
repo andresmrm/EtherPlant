@@ -1,7 +1,7 @@
 EtherPlant
 ==========
 
-A simple web page to code in Etherpad and visualize in PlantUML.
+A simple web page to code in [Etherpad](http://etherpad.org) and visualize in [PlantUML](http://plantuml.com).
 
 #### Use
 
