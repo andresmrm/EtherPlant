@@ -1,0 +1,16 @@
+.moveable {
+    margin: 1px 1px 1px 1px;
+    float:left;
+    background:#FFFFFF;
+    overflow:hidden;
+    border: 1px solid black;
+}
+
+.first{
+    width:48%;
+    height:700px;
+}
+.second{
+    width:48%;
+    height:700px;
+}
