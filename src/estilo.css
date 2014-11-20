@@ -6,11 +6,11 @@
     border: 1px solid black;
 }
 
-.first{
+#pad{
     width:48%;
     height:700px;
 }
-.second{
+#viewer{
     width:48%;
     height:700px;
 }

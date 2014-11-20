@@ -1,6 +1,5 @@
-source = location.search.substr(1);
+url_param = window.location.search.substr(1);
 last_content = "";
-pegarId = function(id){ return document.getElementById(id) };
 
 function encode64(data) {
 	r = "";
@@ -61,7 +60,7 @@ if (deflater) {
 }
 
 function done_deflating(e) {
-	//pegarId('im').src = "http://www.plantuml.com/plantuml/svg/"+encode64(e.data);
+	//$('#im').src = "http://www.plantuml.com/plantuml/svg/"+encode64(e.data);
 	$("#png-link").attr("href", "http://www.plantuml.com/plantuml/png/"+encode64(e.data));
 	$("#svg-link").attr("href", "http://www.plantuml.com/plantuml/svg/"+encode64(e.data));
 	$.ajax({
@@ -97,16 +96,12 @@ function compress(s) {
 
 function updateImage() {
 	$.ajax({
-		url: source+"/export/txt",
-		// the name of the callback parameter, as specified by the YQL service
-			// work with the response
+		url: url_param+"/export/txt",
 		success: function( response ) {
 			compress( response ); // server response
 		}
 	});
 }
-
-setInterval( "updateImage()", 5000 );
 
 $(function() {
 	var resizehandler = {
@@ -114,5 +109,13 @@ $(function() {
 	};
 	$(".moveable").resizable(resizehandler);
 
-	$("#pad-iframe").attr("src", source+"?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=true");
+	if (url_param.substr(0,4) == "http") {
+		$(".not-working").hide();
+		setInterval( "updateImage()", 5000 );
+		$("#pad-iframe").attr("src", url_param+"?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=true");
+	} else {
+		$(".working").hide();
+		$(".not-working").show();
+	}
 });
+
