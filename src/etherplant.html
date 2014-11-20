@@ -13,9 +13,10 @@
 	<script src="etherplant.js"></script>
 </head>
 <body>
-
 	<div id="pad" class="moveable working">
-		<iframe id='pad-iframe' name='embed_readwrite' src='' width=100% height=100%></iframe>
+		<div id="pad-inner">
+				<iframe id='pad-iframe' name='embed_readwrite' src='' width=100% height=100%></iframe>
+		</div>
 	</div>
 
 	<!--
@@ -25,6 +26,7 @@
 		<div id="sv"></div>
 	</div>
 	<div class="working">
+		Export:
 		<a id="png-link" href="">PNG</a>
 		<a id="svg-link" href="">SVG</a>
 	</div>
@@ -32,6 +34,13 @@
 		<p>To use, place a URL to an EtherPad in the params of this page. Exemple: "?https://pad.okfn.org/p/etherplant".</p>
 		<p>A full working URL would be something like <a href="//andresmrm.github.io/EtherPlant/src/etherplant.html?https://pad.okfn.org/p/etherplant">andresmrm.github.io/EtherPlant/src/etherplant.html?https://pad.okfn.org/p/etherplant</a></p>
 		<p>The EtherPad used must support "/export/txt" to export the content has text. At least for now...</p>
+	</div>
+	<div id="footer">
+		<a href="http://www.plantuml.com">Help</a>
+		<a href="https://github.com/andresmrm/EtherPlant">Source</a>
+		Powered by:
+		<a href="http://www.plantuml.com">PlantUML</a>
+		<a href="http://etherpad.org">EtherPad</a>
 	</div>
 </body>
 </html>
