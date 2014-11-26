@@ -60,11 +60,12 @@ if (deflater) {
 }
 
 function done_deflating(e) {
+	cod = encode64(e.data);
 	//$('#im').src = "http://www.plantuml.com/plantuml/svg/"+encode64(e.data);
-	$("#png-link").attr("href", "http://www.plantuml.com/plantuml/png/"+encode64(e.data));
-	$("#svg-link").attr("href", "http://www.plantuml.com/plantuml/svg/"+encode64(e.data));
+	$("#png-link").attr("href", link_to_png(cod));
+	$("#svg-link").attr("href", link_to_svg(cod));
 	$.ajax({
-		url: "http://www.plantuml.com/plantuml/svg/"+encode64(e.data),
+		url: link_to_svg(cod),
 		dataType: 'text',
 		success: function( response ) {
 			$("#sv").html(response);
@@ -94,6 +95,23 @@ function compress(s) {
 	}
 }
 
+function convert_txt(s) {
+	//UTF8
+	s = unescape(encodeURIComponent(s));
+	s = deflate(s);
+	return encode64(s);
+}
+
+function link_to_svg(cod) {
+	return "http://www.plantuml.com/plantuml/svg/"+cod;
+}
+function link_to_png(cod) {
+	return "http://www.plantuml.com/plantuml/png/"+cod;
+}
+function link_to_dinamic_svg(pad_url) {
+	return window.location.toString().replace('?', "?svg&");
+}
+
 function updateImage() {
 	$.ajax({
 		url: url_param+"/export/txt",
@@ -109,13 +127,29 @@ $(function() {
 	};
 	$(".moveable").resizable(resizehandler);
 
+	// Working page
 	if (url_param.substr(0,4) == "http") {
 		$(".not-working").hide();
 		setInterval( "updateImage()", 5000 );
 		$("#pad-iframe").attr("src", url_param+"?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=true");
-	} else {
+		$("#svg-dinamic").attr("href", link_to_dinamic_svg(url_param));
+	
+	// Redirect to the SVG image
+	} else if(url_param.substr(0,8) == "svg&http"){
+		$(".working").hide();
+		$(".not-working").hide();
+		$('body').append('<p>Rederecting to image...</p>');
+		$.ajax({
+			url: url_param.substr(4)+"/export/txt",
+			success: function( response ) {
+				encoded = convert_txt(response);
+				window.location = link_to_svg(encoded);
+			}
+		});
+
+	// Main-Help page
+	} else{
 		$(".working").hide();
 		$(".not-working").show();
 	}
 });
-
