@@ -7,15 +7,15 @@ A fork of the projet https://github.com/andresmrm/EtherPlant : A simple web page
 
 You can test it here:
 
-http://andresmrm.github.io/EtherPlant/src/etherplant.html
+http://orange-opensource.github.io/EtherPlant/src/index.html
 
 Add "?" and a link to a pad in the end of the url, like:
 
-http://andresmrm.github.io/EtherPlant/src/etherplant.html?https://pad.okfn.org/p/etherplant
+http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/etherplant
 
 Changining the last word in the link you can change the pad! =D
 
-http://andresmrm.github.io/EtherPlant/src/etherplant.html?https://pad.okfn.org/p/mypersonalplantuml
+http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/mypersonalplantuml
 
 #### Install
 
@@ -24,7 +24,7 @@ Just serve the files in the folder **src** via an HTTP server.
 #### Architecture
 
 I'm no good at UML, but I made a diagram to try to show the architecture of EtherPlant:
-http://andresmrm.github.io/EtherPlant/src/etherplant.html?https://pad.okfn.org/p/etherplant-architecture
+http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/etherplant-architecture
 
 #### Updates from original project
 
