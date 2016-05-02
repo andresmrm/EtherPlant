@@ -13,13 +13,11 @@ Add "?" and a link to a pad in the end of the url, like:
 
 http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/etherplant
 
-Changining the last word in the link you can change the pad! =D
+Changing the last word in the link you can change the pad! =D
 
 http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/mypersonalplantuml
 
 https://orange-opensource.github.io/EtherPlant/src/?https://annuel.framapad.org/p/plantuml
-
-https://orange-opensource.github.io/EtherPlant/src/?https://annuel.framapad.org/p/r.d3e8f95fbc4485399e90101b07b08a63
 
 #### Install
 
@@ -27,7 +25,7 @@ Just serve the files in the folder **src** via an HTTP server.
 
 #### Architecture
 
-I'm no good at UML, but I made a diagram to try to show the architecture of EtherPlant:
+Diagram made by Andrés Martano (https://github.com/andresmrm) to try to show the architecture of EtherPlant:
 http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/etherplant-architecture
 
 #### Updates from original project
