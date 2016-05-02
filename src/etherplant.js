@@ -1,155 +1,263 @@
-url_param = window.location.search.substr(1);
-last_content = "";
+/*
+ * @preserve
+ * etherplant
+ * 
+ * Module name: etherplant
+ * Version:     to be completed
+ * Created:     20 Nov 2014 by andresmrm
+ * 
+ * Copyleft (C) 2014 - 2015 andresmrm
+ * Copyleft (C) 2015 - 2015 Orange
+ * 
+ * GNU AFFERO GENERAL PUBLIC LICENSE Version 3
+ * 
+ */
 
-function encode64(data) {
-	r = "";
-	for (i=0; i<data.length; i+=3) {
- 		if (i+2==data.length) {
-			r +=append3bytes(data.charCodeAt(i), data.charCodeAt(i+1), 0);
-		} else if (i+1==data.length) {
-			r += append3bytes(data.charCodeAt(i), 0, 0);
-		} else {
-			r += append3bytes(data.charCodeAt(i), data.charCodeAt(i+1), data.charCodeAt(i+2));
-		}
-	}
-	return r;
-}
+// URL to PlantUML Server. Don't forget the last "/"
+var PLANTUML_SERVER="http://plantuml.com/plantuml/";
+// Use (or not) plantuml proxy mode for latest diagram URL.
+// This option is set to false because it doesn't work with the latest PlantUML server proxy mode !!!
 
-function append3bytes(b1, b2, b3) {
-	c1 = b1 >> 2;
-	c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
-	c3 = ((b2 & 0xF) << 2) | (b3 >> 6);
-	c4 = b3 & 0x3F;
-	r = "";
-	r += encode6bit(c1 & 0x3F);
-	r += encode6bit(c2 & 0x3F);
-	r += encode6bit(c3 & 0x3F);
-	r += encode6bit(c4 & 0x3F);
-	return r;
-}
+var USE_PROXY_PLANTUML_MODE=false;
 
-function encode6bit(b) {
-	if (b < 10) {
- 		return String.fromCharCode(48 + b);
-	}
-	b -= 10;
-	if (b < 26) {
- 		return String.fromCharCode(65 + b);
-	}
-	b -= 26;
-	if (b < 26) {
- 		return String.fromCharCode(97 + b);
-	}
-	b -= 26;
-	if (b == 0) {
- 		return '-';
-	}
-	if (b == 1) {
- 		return '_';
-	}
-	return '?';
-}
+var lastContent = "";
+var cod;
+var posX;
+var posY;
+var previousEvent;
+var selectedDynamicType="svg";
+var elaspedTime=0;
+var timer;
+var refreshMode=5;
+var urlParam;
 
-var deflater = window.SharedWorker && new SharedWorker('rawdeflate.js');
-if (deflater) {
-	deflater.port.addEventListener('message', done_deflating, false);
-	deflater.port.start();
-} else if (window.Worker) {
-	deflater = new Worker('rawdeflate.js');
-	deflater.onmessage = done_deflating;
-}
+var typeTranslations={
+    "svg": "SVG",
+    "txt": "ASCII Art",
+    "img": "PNG"
+};
 
-function done_deflating(e) {
-	cod = encode64(e.data);
-	//$('#im').src = "http://www.plantuml.com/plantuml/svg/"+encode64(e.data);
-	$("#png-link").attr("href", link_to_png(cod));
-	$("#svg-link").attr("href", link_to_svg(cod));
-	$.ajax({
-		url: link_to_svg(cod),
-		dataType: 'text',
-		success: function( response ) {
-			$("#sv").html(response);
-		}
-	});
+function launchRefreshTimer() {
+    if (refreshMode==0) {
+        clearInterval(timer);
+ 	$("#next-refresh").hide();
+    } else {
+	$("#next-refresh").text(refreshMode+"s");
+ 	$("#next-refresh").show();
+	elaspedTime=0;
+	clearInterval(timer);
+	timer=setInterval(function() {
+            elaspedTime++;
+            if (elaspedTime>=refreshMode) {
+		updateImage();
+		elaspedTime=0;
+            }
+	    var nextRefresh=refreshMode-elaspedTime;
+            $("#next-refresh").text(nextRefresh+"s");
+	}, 1000);
+    }
 }
 
 function compress(s) {
-	//Check if text changed
-	if (last_content != s){
-		last_content = s;
-
-		//UTF8
-		s = unescape(encodeURIComponent(s));
-
-		if (deflater) {
-			if (deflater.port && deflater.port.postMessage) {
-				deflater.port.postMessage(s);
-			} else {
-				deflater.postMessage(s);
-			}
-		} else {
-			setTimeout(function() {
-				done_deflating({ data: deflate(s) });
-			}, 100);
-		}
-	}
-}
-
-function convert_txt(s) {
+    //Check if text changed
+    if (lastContent != s){
+        clearInterval(timer);
+	lastContent = s;
+	$("#refresh-mode").attr("disabled", "disabled");
+        $("#refresh-button").attr("disabled", "disabled");
 	//UTF8
-	s = unescape(encodeURIComponent(s));
-	s = deflate(s);
-	return encode64(s);
+	cod=convertTxt(s);
+	// force link refresh for first image generation
+	$("#export-links").change();
+	$("#diagram").on("load", function() {
+	    launchRefreshTimer();
+	    $("#refresh-button").removeAttr("disabled");
+	    $("#refresh-mode").removeAttr("disabled");
+	}).attr("src", linkTo(cod, "img"));
+    }
 }
 
-function link_to_svg(cod) {
-	return "http://www.plantuml.com/plantuml/svg/"+cod;
+function convertTxt(s) {
+    //UTF8
+    s = unescape(encodeURIComponent(s));
+    s = RawDeflate.deflate(s);
+    return Base64.encode(s);
 }
-function link_to_png(cod) {
-	return "http://www.plantuml.com/plantuml/png/"+cod;
-}
-function link_to_dinamic_svg(pad_url) {
-	return window.location.toString().replace('?', "?svg&");
+
+
+function linkTo(cod, type) {
+    return PLANTUML_SERVER+type+"/"+cod;
 }
 
 function updateImage() {
-	$.ajax({
-		url: url_param+"/export/txt",
-		success: function( response ) {
-			compress( response ); // server response
-		}
-	});
+    $.ajax({
+	url: urlParam+"/export/txt",
+	success: function( response ) {
+	    compress( response ); // server response
+	}
+    });
 }
 
+function draggable(e) {
+    e.preventDefault();
+    
+    posX=$("#viewer").scrollLeft();
+    posY=$("#viewer").scrollTop();
+    
+    previousEvent = e;
+    $(document).on('mousemove', drag);
+    $(document).on('mouseup', removeDrag);
+}
+
+function removeDrag() {
+    $(document).off('mouseup');
+    $(document).off('mousemove');
+}
+
+function drag(e) {
+    e.preventDefault();
+
+    posX -= (e.pageX -previousEvent.pageX);
+    posY -= (e.pageY - previousEvent.pageY);
+
+    previousEvent = e;
+    $("#viewer").scrollTop(posY);
+    $("#viewer").scrollLeft(posX);
+}
+
+
 $(function() {
-	var resizehandler = {
-		handles: 'n,s,e,w,sw,se,ne,nw'
-	};
-	$(".moveable").resizable(resizehandler);
-
-	// Working page
-	if (url_param.substr(0,4) == "http") {
-		$(".not-working").hide();
-		setInterval( "updateImage()", 5000 );
-		$("#pad-iframe").attr("src", url_param+"?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=true");
-		$("#svg-dinamic").attr("href", link_to_dinamic_svg(url_param));
-	
-	// Redirect to the SVG image
-	} else if(url_param.substr(0,8) == "svg&http"){
-		$(".working").hide();
-		$(".not-working").hide();
-		$('body').append('<p>Rederecting to image...</p>');
-		$.ajax({
-			url: url_param.substr(4)+"/export/txt",
-			success: function( response ) {
-				encoded = convert_txt(response);
-				window.location = link_to_svg(encoded);
-			}
-		});
-
-	// Main-Help page
-	} else{
-		$(".working").hide();
-		$(".not-working").show();
+    $("#diagram").on('mousewheel DOMMouseScroll', function(e) {
+	var deltaY = 0;
+	e.preventDefault();
+	if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
+	    $(this).css("width", "+=25%");
+	}else {
+	    $(this).css("width", "-=25%");
 	}
+    });
+    $("#diagram").on('mousedown', draggable);
+
+    $("#refresh-button").on("click", function() {
+	elaspedTime=0;
+	updateImage();
+    });
+
+    $("#refresh-mode").change(function(){
+        var selected=$( "#refresh-mode option:selected" );
+	refreshMode=selected.val();
+	launchRefreshTimer();
+	window.location.hash = refreshMode;
+
+    });
+
+    $("#export-links").change(function(){
+        var selected=$( "#export-links option:selected" );
+        if (m=selected.val().match(/^(current|last)-(svg|img|txt)$/)) {
+	    if (m[1]=="last") {
+		if (USE_PROXY_PLANTUML_MODE) {
+		    $("#export-link").show();
+		    $("#export-input").hide();
+		    $("#export-link").attr("href", PLANTUML_SERVER+"proxy?src="+urlParam+"/export/txt&fmt="+m[2]).text("Last diagram "+typeTranslations[m[2]]+" link");
+		}else {
+		    $("#export-link").hide();
+		    $("#export-input").show();
+		    $("#export-input").val(window.location.toString().replace('?', "?"+m[2]+"&"));
+		}
+	    } else {
+		$("#export-link").show();
+		$("#export-input").hide();
+		$("#export-link").attr("href", linkTo(cod, m[2])).text(typeTranslations[m[2]]+" diagram");
+	    }
+        } else {
+	    $("#export-link").show();
+	    $("#export-input").hide();
+	    $("#export-link").attr("href", "?fs&"+urlParam).text("Auto-refresh diagram");
+	}
+    });
+    
+    $("#padurl").keypress(function (e) {
+	if (e.which == 13) {
+	    $("#load-pad").trigger("click");
+	}
+    });
+
+    $("#load-pad").on("click", function() {
+	urlParam=$("#padurl").val();
+	window.location="?"+urlParam;
+    });
+    
+    urlParam = window.location.search.substr(1);
+    // Bug fix : replace %20 (space) in pad name by _
+    urlParam=urlParam.replace(/%20/g, "_");
+
+    if (m=window.location.hash.match(/^#(0|5|10|15|20|30)$/)) {
+	refreshMode=m[1];
+    }
+
+    // Retrieve pad name in etherpad URL
+    if (urlParam && urlParam.match(/.*\/(.*)$/)) {
+      var pad_name=urlParam.match(/.*\/(.*)$/)[1];
+      if (pad_name) {
+        document.title = "EtherPlant - "+pad_name;
+      }
+    }
+
+    if(m=urlParam.substr(0,8).match(/^(svg|img|txt)&http$/)){
+        // Just result view
+        $("body > div").hide();
+	$("frame").hide();
+	urlParam=urlParam.substr(4);
+	$('body').append('<p>Rederecting to image...</p>');
+	$.ajax({
+	    url: urlParam+"/export/txt",
+	    success: function( response ) {
+		encoded = convertTxt(response);
+		window.location = linkTo(encoded, m[1]);
+	    }
+	});
+    } else {
+      // Main page with Etherpad and Result view
+      $(".not-working").hide();
+      var layout=$('body').layout({
+	    north__size: 50,
+	    north__minSize: 50,
+	    north__maxSize: 50,
+	    north__resizable: false,
+	    south__size: 30,
+	    south__minSize: 30,
+	    south__maxSize: 30,
+	    south__resizable: false,
+	    west__minSize: 0,
+	    west__size: .50,
+	    west__maskContents: true,
+	    center__size: .50,
+	    center__minSize: 0,
+	    center__maskContents: true,
+	    stateManagement__enabled: true
+      });
+      if (m=urlParam.substr(0,7).match(/^(fs&)?http/)) {
+	if (m[1]=="fs&") {
+	    layout.hide( "west" );
+	    layout.open( "center" );
+	    layout.hide( "north" );
+	    layout.hide( "south" );
+	    urlParam=urlParam.substr(3);
+        } else {
+            $("#padurl").val(urlParam);
+	    layout.open( "west" );
+	    layout.open( "center" );
+	    layout.open( "north" );
+	    layout.open( "south" );
+	    $("#pad-iframe").attr("src", urlParam+"?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=true");
+	}
+	$("#refresh-mode").val(refreshMode);
+	launchRefreshTimer();
+	updateImage();
+      } else{
+        // No pad name given
+	$(".working").hide();
+	$(".not-working").show();
+      }
+    }
 });
