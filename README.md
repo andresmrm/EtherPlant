@@ -17,6 +17,10 @@ Changining the last word in the link you can change the pad! =D
 
 http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.org/p/mypersonalplantuml
 
+https://orange-opensource.github.io/EtherPlant/src/?https://annuel.framapad.org/p/plantuml
+
+https://orange-opensource.github.io/EtherPlant/src/?https://annuel.framapad.org/p/r.d3e8f95fbc4485399e90101b07b08a63
+
 #### Install
 
 Just serve the files in the folder **src** via an HTTP server.
