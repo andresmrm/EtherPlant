@@ -39,3 +39,7 @@ http://orange-opensource.github.io/EtherPlant/src/index.html?https://pad.okfn.or
 
 The code is not big, but was made in a few hours, so it's not good to look at... Feel free to submit patches.
 
+#### The same idea for Remark.js
+
+The project [EtheRemark](http://github.com/Orange-OpenSource/EtheRemark) allow you to create collaborative slideshow with Remark.js.
+
