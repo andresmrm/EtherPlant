@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- Copyleft (C) 2014 - 2015 andresmrm -->
+<!-- Copyleft (C) 2015 - 2015 Orange -->
+<!-- Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE Version 3 -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>EtherPlant</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <script src="jquery.layout-latest.js"></script>
+    <link href="layout-default-latest.css" rel="stylesheet" type="text/css">
+    
+    <!--  taken from https://github.com/johan/js-deflate -->
+    <script src="rawdeflate.js"></script>
+    <script src="base64.js"></script>
+    <script src="etherplant.js"></script>
+    
+    <style>
+    .ui-layout-pane { 
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    } 
+
+    .ui-layout-center {
+      text-align: center;
+    }
+
+    .ui-layout-south {
+      font-size:16px;
+    }
+
+    table {
+      border-collapse: collapse;
+      height: 100%;
+    }
+
+    td, th {
+      border-right: 1px solid #888;
+      text-align: left;
+      vertical-align: top;
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+
+    a {
+      color: #F60;
+    }
+
+    .ui-layout-north,  .ui-layout-south {
+      background-color: #333;
+      color: white;
+    }
+
+    .ui-layout-north {
+      display: flex;
+      height: 44px;
+      line-height: 44px;
+      color: #EEE;
+    }
+
+    .ui-layout-north > div {
+      display: inline-block;
+      border-right: 1px solid #9d9d9d;
+      padding-left: 3px;
+      padding-right: 3px;
+    }
+    
+    .ui-layout-north h1 {
+      display: inline;
+      font-weight: normal;
+      font-size:20px !important;
+      padding: 0;
+      margin: 0;
+      color: #9d9d9d;
+    }
+
+    #viewer {
+      overflow: hidden;
+    }
+
+    #diagram {
+      cursor: move;
+    }
+    
+    .ui-layout-north a, .ui-layout-south a {
+      color: #EEE;
+      text-decoration: underline;
+    }
+
+    .ui-layout-south {
+      line-height: 30px;
+      text-align: center;
+    }
+
+    #pad-iframe {
+      overflow: hidden;
+    }
+
+    </style>
+  </head>
+  <body role='document'>
+    <div class="ui-layout-north">
+      <div><h1>EtherPlant</h1></div>
+      <div>
+	<input type="text" id="padurl" placeholder="YOUR_PLANTUML_PAD" size="40" />
+	<button id="load-pad">Load</button>
+      </div>
+      <div id="refresh" class="working">
+	Refresh <select id="refresh-mode">
+	  <option value="0">Manual</option>
+	  <option value="5">Every 5s</option>
+	  <option value="10">Every 10s</option>
+	  <option value="15">Every 15s</option>
+	  <option value="20">Every 20s</option>
+	  <option value="30">Every 30s</option>
+	</select>
+        <button id="refresh-button"><span id="next-refresh">5s</span> <i class="fa fa-refresh" aria-hidden="true"></i></button>
+      </div>
+      <div class="working">
+	Diagram links :
+	<select id="export-links">
+          <option value="auto">Auto refresh</option>
+	  <optgroup label="Current">
+	    <option value="current-svg">SVG</option>
+	    <option value="current-img" selected>PNG</option>
+	    <option value="current-txt">ASCII Art</option>
+	  </optgroup>
+	  <optgroup label="Last">
+	    <option value="last-svg">SVG</option>
+	    <option value="last-img">PNG</option>
+	    <option value="last-txt">ASCII Art</option>
+	  </optgroup>
+	</select>
+	<a id="export-link" href="" target="_blank" style="display:none"></a>
+	<input type="text" id="export-input" style="display:none"/>
+      </div>
+    </div>
+    <div class="ui-layout-west">
+      <div class="not-working" style="display:none">
+	<h1>No PlantUML Etherpad URL given</h1>
+	<p>Enter your Etherpad address in the text field above (eg <a href="?https://pad.okfn.org/p/etherplant">https://pad.okfn.org/p/etherplant</a>).</p>
+      </div>
+      <iframe id="pad-iframe" height="100%" width="100%" frameborder=0></iframe>
+    </div>
+    <div class="ui-layout-center working" id="viewer">
+      <img id="diagram"/>
+    </div>
+    <div class="ui-layout-south">
+      Powered by <a href="http://etherpad.org/" target="_blank">Etherpad</a> and <a href="http://plantuml.com/" target="_blank">PlantUML</a> - <a href="https://github.com/Orange-OpenSource/EtherPlant" target="_blank">Source code</a>
+    </div>
+    </div>
+  </body>
+</html>
