@@ -1,3 +1,5 @@
+**Check a much more ergonomic version [here](https://github.com/Orange-OpenSource/EtherPlant)!**
+
 EtherPlant
 ==========
 
