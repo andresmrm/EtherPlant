@@ -149,9 +149,23 @@ $(function() {
 		refreshMode=selected.val();
 		launchRefreshTimer();
 		window.location.hash = refreshMode;
-
+    });
+    $("#image-type").change(function(){
+        var selected=$( "#image-type option:selected" );
+		imgType=selected.val();
+		if (lastContent) {
+			cod=convertTxt(lastContent);
+			$("#export-links").change();
+			$("#diagram").on("load", function() {
+				launchRefreshTimer();
+				$("#refresh-button").removeAttr("disabled");
+				$("#refresh-mode").removeAttr("disabled");
+			}).attr("src", linkTo(cod, imgType));
+		}
+		window.location.hash = refreshMode+"/"+imgType;
     });
 
+	
     $("#export-links").change(function(){
         var selected=$( "#export-links option:selected" );
         if (m=selected.val().match(/^(current|last)-(svg|img|txt)$/)) {
@@ -192,8 +206,12 @@ $(function() {
     // Bug fix : replace %20 (space) in pad name by _
     urlParam=urlParam.replace(/%20/g, "_");
 
-    if (m=window.location.hash.match(/^#(0|5|10|15|20|30)$/)) {
+    if (m=window.location.hash.match(/^#(0|5|10|15|20|30)(\/(svg|img))?$/)) {
 		refreshMode=m[1];
+		if (m[3]) {
+			// If hash #svg use SVG for display image result. Fix limitations on PNG generated with plantuml.com server
+			imgType=m[3];
+		}
     }
 
     // Retrieve pad name in etherpad URL
@@ -237,10 +255,6 @@ $(function() {
 			center__maskContents: true,
 			stateManagement__enabled: true
 		});
-		if (window.location.hash.match(/svg/)) {
-			// If hash #svg use SVG for display image result. Fix limitations on PNG generated with plantuml.com server
-			imgType="svg";
-		}
 		if (m=urlParam.substr(0,7).match(/^(fs&)?http/)) {
 			if (m[1]=="fs&") {
 				layout.hide( "west" );

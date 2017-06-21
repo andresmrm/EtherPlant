@@ -108,43 +108,50 @@
     <div class="ui-layout-north">
       <div><h1>EtherPlant</h1></div>
       <div>
-	<input type="text" id="padurl" placeholder="YOUR_PLANTUML_PAD" size="40" />
-	<button id="load-pad">Load</button>
+		<input type="text" id="padurl" placeholder="YOUR_PLANTUML_PAD" size="40" />
+		<button id="load-pad">Load</button>
       </div>
       <div id="refresh" class="working">
-	Refresh <select id="refresh-mode">
-	  <option value="0">Manual</option>
-	  <option value="5">Every 5s</option>
-	  <option value="10">Every 10s</option>
-	  <option value="15">Every 15s</option>
-	  <option value="20">Every 20s</option>
-	  <option value="30">Every 30s</option>
-	</select>
+		Refresh <select id="refresh-mode">
+		<option value="0">Manual</option>
+		<option value="5">Every 5s</option>
+		<option value="10">Every 10s</option>
+		<option value="15">Every 15s</option>
+		<option value="20">Every 20s</option>
+		<option value="30">Every 30s</option>
+		</select>
         <button id="refresh-button"><span id="next-refresh"></span> <i class="fa fa-refresh" aria-hidden="true"></i></button>
       </div>
       <div class="working">
-	Diagram links :
-	<select id="export-links">
+		Preview format :  
+		<select id="image-type">
+		  <option value="svg">SVG</option>
+		  <option value="img" selected>PNG</option>
+		</select>
+	  </div>
+      <div class="working">
+		Export links :
+		<select id="export-links">
           <option value="auto">Auto refresh</option>
-	  <optgroup label="Current">
-	    <option value="current-svg">SVG</option>
-	    <option value="current-img" selected>PNG</option>
-	    <option value="current-txt">ASCII Art</option>
-	  </optgroup>
-	  <optgroup label="Last">
-	    <option value="last-svg">SVG</option>
-	    <option value="last-img">PNG</option>
-	    <option value="last-txt">ASCII Art</option>
-	  </optgroup>
-	</select>
-	<a id="export-link" href="" target="_blank" style="display:none"></a>
-	<input type="text" id="export-input" style="display:none"/>
+		  <optgroup label="Current">
+			<option value="current-svg">SVG</option>
+			<option value="current-img" selected>PNG</option>
+			<option value="current-txt">ASCII Art</option>
+		  </optgroup>
+		  <optgroup label="Last">
+			<option value="last-svg">SVG</option>
+			<option value="last-img">PNG</option>
+			<option value="last-txt">ASCII Art</option>
+		  </optgroup>
+		</select>
+		<a id="export-link" href="" target="_blank" style="display:none"></a>
+		<input type="text" id="export-input" style="display:none"/>
       </div>
     </div>
     <div class="ui-layout-west">
       <div class="not-working" style="display:none">
-	<h1>No PlantUML Etherpad URL given</h1>
-	<p>Enter your Etherpad address in the text field above (eg <a href="?https://pad.okfn.org/p/etherplant">https://pad.okfn.org/p/etherplant</a>).</p>
+		<h1>No PlantUML Etherpad URL given</h1>
+		<p>Enter your Etherpad address in the text field above (eg <a href="?https://pad.okfn.org/p/etherplant">https://pad.okfn.org/p/etherplant</a>).</p>
       </div>
       <iframe id="pad-iframe" height="100%" width="100%" frameborder=0></iframe>
     </div>
